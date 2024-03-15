@@ -2,6 +2,7 @@ package de.hype.bbsentials.profileidfromlogs;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -22,18 +23,19 @@ public class Main {
         System.out.println("Starting profile id verification");
         List<String> profileIdList = profileIds.stream().toList();
         int listSize = profileIdList.size();
-        List<String> profileStringDisplay = new ArrayList<>();
+        List<Profile> validProfiles = new ArrayList<>();
         String mcuuid = core.getMcuuid();
         for (int i = 0; i < profileIdList.size(); i++) {
             String profileId = profileIdList.get(i);
             System.out.println("Verifying Profile id: " + profileId + " → " + (i + 1) + "/" + listSize);
             Profile prof = core.getProfile(profileId);
             if (prof != null && prof.isValid(mcuuid)) {
-                profileStringDisplay.add(prof.getDisplayString());
+                validProfiles.add(prof);
             }
         }
+        validProfiles.sort(Comparator.comparingInt(Profile::getBingoId));
         System.out.println("Everything combined took: " + (Instant.now().toEpochMilli() - startingTime.toEpochMilli()) + "ms");
-        System.out.println("Result: \n" + String.join("\n", profileStringDisplay));
+        System.out.println("Result: \n" + String.join("\n", validProfiles.stream().map(Profile::getDisplayString).toList()));
     }
 }
 
