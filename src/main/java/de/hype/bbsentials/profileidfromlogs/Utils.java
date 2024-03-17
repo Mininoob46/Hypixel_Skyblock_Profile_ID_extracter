@@ -170,12 +170,12 @@ public class Utils{
                     else {
                         try {
                             String fileName = file.getName();
-                            if (fileName.endsWith(".log")) {
+                            if (fileName.endsWith(".log.gz")) {
                                 filesList.add(file.getAbsolutePath());
                             }
-//                            else if (fileName.endsWith(".log")) {
-//                                filesList.add(file.getAbsolutePath());
-//                            }
+                            else if (fileName.endsWith(".log")) {
+                                filesList.add(file.getAbsolutePath());
+                            }
                         } catch (SecurityException e) {
                             // Ignore exception related to insufficient privileges
                             // or any other security issues
