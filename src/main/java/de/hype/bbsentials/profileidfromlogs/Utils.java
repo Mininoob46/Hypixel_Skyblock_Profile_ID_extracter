@@ -9,13 +9,13 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-public class Utils{
+public class Utils {
     public static String getMcUUIDbyUsername(String username) {
         try {
             String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
@@ -63,21 +63,41 @@ public class Utils{
 
     private static Set<String> getIdsFromFile(String filePath) {
         Set<String> ids = new HashSet<>();
-        try (FileInputStream fileInputStream = new FileInputStream(filePath);
-             GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
-             InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream);
-             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                String profileId = extractProfileIdFromLine(line);
-                if (profileId != null) {
-                    ids.add(profileId);
+        if (filePath.endsWith(".log.gz")) {
+            try (FileInputStream fileInputStream = new FileInputStream(filePath);
+                 GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
+                 InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream);
+                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String profileId = extractProfileIdFromLine(line);
+                    if (profileId != null) {
+                        ids.add(profileId);
+                    }
                 }
+                if (ids.isEmpty()) return ids;
+                System.out.println("File complete: " + filePath + " | Keys: " + String.join(";", ids));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            if (ids.isEmpty()) return ids;
-            System.out.println("File complete: " + filePath + " | Keys: " + String.join(";", ids));
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        else {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String profileId = extractProfileIdFromLine(line);
+                    if (profileId != null) {
+                        ids.add(profileId);
+                    }
+                }
+                if (ids.isEmpty()) return ids;
+                System.out.println("File complete: " + filePath + " | Keys: " + String.join(";", ids));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return ids;
     }
@@ -128,9 +148,10 @@ public class Utils{
         return profileIds;
     }
 
-    public static File getUserHome(){
+    public static File getUserHome() {
         return new File(System.getProperty("user.home"));
     }
+
     public static java.util.List<String> searchUserLogs(File folder) {
         java.util.List<String> files = searchLogsRecursive(folder);
         System.out.println("Found a total of " + files.size() + " Potential logs");
@@ -150,6 +171,9 @@ public class Utils{
                         try {
                             String fileName = file.getName();
                             if (fileName.endsWith(".log.gz")) {
+                                filesList.add(file.getAbsolutePath());
+                            }
+                            else if (fileName.endsWith(".log")) {
                                 filesList.add(file.getAbsolutePath());
                             }
                         } catch (SecurityException e) {
