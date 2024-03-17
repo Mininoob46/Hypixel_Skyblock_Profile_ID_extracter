@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.accessors.runtime.externalModuleDependencyFor
+
 plugins {
     idea
     java
@@ -17,6 +19,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation(files("lib/intellij_forms_rt.jar"))
     implementation("net.hypixel:hypixel-api-transport-reactor:4.4")
 }
 
