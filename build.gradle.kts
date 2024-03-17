@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "de.hype.bbsentials.profileidfromlogs"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
