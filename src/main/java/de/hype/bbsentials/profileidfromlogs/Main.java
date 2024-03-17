@@ -1,41 +1,28 @@
 package de.hype.bbsentials.profileidfromlogs;
 
+import javax.swing.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static de.hype.bbsentials.profileidfromlogs.Utils.*;
+import static de.hype.bbsentials.profileidfromlogs.MainGui.*;
 
 public class Main {
     public static void main(String[] args) {
-        ProfileIDExporter exporter = new ProfileIDExporter();
-        Core core = new Core(args[0], "Hype_the_Time");
-        //TODO add this to the guis;
-        Instant startingTime = Instant.now();
-        System.out.println("Starting Log Search");
-        List<String> files = searchUserLogs(getUserHome());
-        System.out.println("Looking for logs took: " + (Instant.now().toEpochMilli() - startingTime.toEpochMilli()) + "ms");
-        Set<String> profileIds = extractProfileIdsFromLogs(files, true);
-        System.out.println("All Keys: \n" + String.join("\n", profileIds));
-        System.out.println("Looking for profile ids in the logs took: " + (Instant.now().toEpochMilli() - startingTime.toEpochMilli()) + "ms");
-        System.out.println("Starting profile id verification");
-        List<String> profileIdList = profileIds.stream().toList();
-        int listSize = profileIdList.size();
-        List<Profile> validProfiles = new ArrayList<>();
-        String mcuuid = core.getMcuuid();
-        for (int i = 0; i < profileIdList.size(); i++) {
-            String profileId = profileIdList.get(i);
-            System.out.println("Verifying Profile id: " + profileId + " → " + (i + 1) + "/" + listSize);
-            Profile prof = core.getProfile(profileId);
-            if (prof != null && prof.isValid(mcuuid)) {
-                validProfiles.add(prof);
+        // Create and show the Swing GUI
+        MainGui gui = new MainGui();
+        gui.setVisible(true);
+        while (true) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ignored) {
+                //ignored
             }
         }
-        validProfiles.sort(Comparator.comparingInt(Profile::getBingoId));
-        System.out.println("Everything combined took: " + (Instant.now().toEpochMilli() - startingTime.toEpochMilli()) + "ms");
-        System.out.println("Result: \n" + String.join("\n", validProfiles.stream().map(Profile::getDisplayString).toList()));
     }
 }
 

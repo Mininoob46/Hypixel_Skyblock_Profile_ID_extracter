@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-public class Utils {
+public class Utils{
     public static String getMcUUIDbyUsername(String username) {
         try {
             String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
